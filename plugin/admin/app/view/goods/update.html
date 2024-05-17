@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="UTF-8">
+        <title>更新页面</title>
+        <style>
+            /*label.layui-form-label{*/
+            /*    width: 100px;*/
+            /*}*/
+        </style>
+        <link rel="stylesheet" href="/app/admin/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/admin/admin/css/reset.css" />
+        <link rel="stylesheet" href="/app/admin/admin/css/summernote.min.css" />
+        <link rel="stylesheet" href="/app/admin/admin/css/bootstrap.min.css" />
+
+    </head>
+    <body>
+
+        <form class="layui-form">
+
+            <div class="mainBox">
+                <div class="main-container mr-5">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">商品名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="goods_name" value="" required lay-verify="required" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">商品图片</label>
+                        <div class="layui-input-block">
+                            <img class="img-3" src=""/>
+                            <input type="text" style="display:none" name="goods_img" value="" />
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="goods_img">
+                                <i class="layui-icon layui-icon-upload"></i>上传图片
+                            </button>
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-image">
+                                <i class="layui-icon layui-icon-align-left"></i>选择图片
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">上架状态</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" id="status" lay-filter="status" lay-skin="switch" />
+                            <input type="text" style="display:none" name="status" value="0" />
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">商品详情</label>
+                        <div class="layui-input-block">
+                            <div id="summernote" name="desciption"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom">
+                <div class="button-container">
+                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                        提交
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md">
+                        重置
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <script src="/app/admin/component/layui/layui.js?v=2.8.12"></script>
+        <script src="/app/admin/component/pear/pear.js"></script>
+        <script src="/app/admin/admin/js/permission.js"></script>
+        <script src="/app/admin/admin/js/jquery-3.7.1.min.js"></script>
+        <script src="/app/admin/admin/js/bootstrap.min.js"></script>
+        <script src="/app/admin/admin/js/summernote.min.js"></script>
+        <script>
+
+            // 相关接口
+            const PRIMARY_KEY = "id";
+            const SELECT_API = "/app/admin/goods/select" + location.search;
+            const UPDATE_API = "/app/admin/goods/update";
+
+            // 获取数据库记录
+            layui.use(["form", "util", "popup"], function () {
+                let $ = layui.$;
+                $.ajax({
+                    url: SELECT_API,
+                    dataType: "json",
+                    success: function (res) {
+                        // 给表单初始化数据
+                        layui.each(res.data[0], function (key, value) {
+                            let obj = $('*[name="'+key+'"]');
+                            if (typeof obj[0] === "undefined" || !obj[0].nodeName) return;
+                            if (obj[0].nodeName.toLowerCase() === "textarea") {
+                                obj.val(layui.util.escape(value));
+                            } else {
+                                obj.attr("value", value);
+                            }
+                            //富文本-商品详情赋值，div上必须加上name属性
+                            if (key == 'desciption'){
+                                $('#summernote').summernote('code', value);
+                            }
+                        });
+
+                        // 字段 商品图片
+                        layui.use(["upload", "layer"], function() {
+                            let input = layui.$("#goods_img").prev();
+                            input.prev().attr("src", input.val());
+                            layui.$("#attachment-choose-image").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                            input.val(data.url).prev().attr("src", data.url);
+                                        });
+                                    }
+                                });
+                            });
+                            layui.upload.render({
+                                elem: "#goods_img",
+                                url: "/app/admin/upload/image",
+                                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                field: "__file__",
+                                done: function (res) {
+                                    if (res.code > 0) return layui.layer.msg(res.msg);
+                                    this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                                }
+                            });
+                        });
+
+                        // 字段 上架状态 status
+                        layui.use(["form"], function() {
+                            layui.$("#status").attr("checked", layui.$('input[name="status"]').val() != 0);
+                            layui.form.render();
+                            layui.form.on("switch(status)", function(data) {
+                                layui.$('input[name="status"]').val(this.checked ? 1 : 0);
+                            });
+                        })
+
+                        // ajax产生错误
+                        if (res.code) {
+                            layui.popup.failure(res.msg);
+                        }
+
+                    }
+                });
+            });
+
+            //提交事件
+            layui.use(["form", "popup"], function () {
+                layui.form.on("submit(save)", function (data) {
+                    data.field[PRIMARY_KEY] = layui.url().search[PRIMARY_KEY];
+                    //富文本-商品详情获取数据
+                    data.field.desciption = $('#summernote').summernote('code');
+                    layui.$.ajax({
+                        url: UPDATE_API,
+                        type: "POST",
+                        dateType: "json",
+                        data: data.field,
+                        success: function (res) {
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            return layui.popup.success("操作成功", function () {
+                                parent.refreshTable();
+                                parent.layer.close(parent.layer.getFrameIndex(window.name));
+                            });
+                        }
+                    });
+                    return false;
+                });
+            });
+
+            //调用富文本编辑
+            $(document).ready(function () {
+                $('#summernote').summernote({
+                    height: 500,
+                    width:800,
+                    minHeight: 300,
+                    maxwidth: 800,
+                    minwidth: 800,
+                    maxHeight: 500,
+                    focus: false,
+                    callbacks: {
+                        onImageUpload: function (files, editor) {
+                            var $files = $(files);
+                            // 通过each方法遍历每一个file
+                            $files.each(function () {
+                                var file = this;
+                                // FormData，新的form表单封装，具体可百度，但其实用法很简单，如下
+                                var data = new FormData();
+                                // 将文件加入到file中，后端可获得到参数名为“file”
+                                data.append("file", file);
+                                // ajax上传
+                                $.ajax({
+                                    data: data,
+                                    type: "POST",
+                                    url: "/app/admin/upload/image",// div上的action
+                                    cache: false,
+                                    contentType: false,
+                                    processData: false,
+                                    // 成功时调用方法，后端返回json数据
+                                    success: function (response) {
+                                        console.log(response)
+                                        if (response.msg != "上传成功") {
+                                            alert("上传失败：" + response.msg)
+                                        } else {
+                                            // 插入到summernote
+                                            $('#summernote').summernote('insertImage', response.data.url);
+                                        }
+                                    },
+                                });
+                            })
+                        }
+                    }
+                });
+            });
+        </script>
+        </script>
+
+    </body>
+
+</html>
