@@ -2,6 +2,7 @@
 
 namespace app\traits;
 
+use app\enum\ResponseEnum;
 use app\exception\HttpResponseException;
 
 trait Response{
@@ -10,10 +11,10 @@ trait Response{
      *
      * @param mixed  $data   要返回的数据
      * @param string $msg    提示信息
-     * @param int    $code   错误码，默认为1
+     * @param int    $code   错误码
      * @param array  $header 发送的 Header 信息
      */
-    protected function success($data = null, $msg = '请求成功', $code = 200, array $header = [])
+    protected function success($data = null, $msg = ResponseEnum::SUCCESS_MSG, $code = ResponseEnum::SUCCESS_CODE, array $header = [])
     {
         $this->result($msg, $data, $code, $header, 1);
     }
@@ -33,10 +34,10 @@ trait Response{
      *
      * @param string $msg    提示信息
      * @param mixed  $data   要返回的数据
-     * @param int    $code   错误码，默认为0
+     * @param int    $code   错误码
      * @param array  $header 发送的 Header 信息
      */
-    protected function fail($msg = '请求失败', $data = null, $code = 500, array $header = [])
+    protected function fail($msg = ResponseEnum::FAIL_MSG, $data = null, $code = ResponseEnum::ERROR_CODE, array $header = [])
     {
         $this->result($msg, $data, $code, $header, 0);
     }
@@ -49,7 +50,7 @@ trait Response{
      * @param int    $code   错误码，默认为0
      * @param array  $header 发送的 Header 信息
      */
-    protected function error($msg = '系统异常', $data = null, $code = 500, array $header = [])
+    protected function error($msg = ResponseEnum::ERROR_MSG, $data = null, $code = ResponseEnum::ERROR_CODE, array $header = [])
     {
         $this->result($msg, $data, $code, $header, 0);
     }
@@ -60,7 +61,7 @@ trait Response{
      */
     protected function errorBadRequest()
     {
-        $this->result('400 Bad Request',null, 400, [], 0);
+        $this->result(ResponseEnum::BAD_REQUEST_MSG,null, ResponseEnum::BAD_REQUEST_CODE, [], 0);
     }
 
     /**
@@ -69,7 +70,7 @@ trait Response{
      */
     protected function errorUnauthorized()
     {
-        $this->result('请先登录',null, 401, [], 0);
+        $this->result(ResponseEnum::UNAUTHORIZED_MSG,null, ResponseEnum::UNAUTHORIZED_CODE, [], 0);
     }
 
     /**
@@ -78,7 +79,7 @@ trait Response{
      */
     protected function errorForbidden()
     {
-        $this->result('403 Forbidden',null, 403, [], 0);
+        $this->result(ResponseEnum::FORBIDDEN_MSG,null, ResponseEnum::FORBIDDEN_CODE, [], 0);
     }
 
     /**
@@ -87,7 +88,7 @@ trait Response{
      */
     protected function errorNotFound()
     {
-        $this->result('404 Not Found',null, 404, [], 0);
+        $this->result(ResponseEnum::NOT_FOUND_MSG,null, ResponseEnum::NOT_FOUND_CODE, [], 0);
     }
 
     /**
@@ -96,7 +97,7 @@ trait Response{
      */
     protected function errorMethodNotAllowed()
     {
-        $this->result('Method Not Allowed',null, 405, [], 0);
+        $this->result(ResponseEnum::METHOD_NOT_ALLOWED_MSG,null, ResponseEnum::METHOD_NOT_ALLOWED_CODE, [], 0);
     }
 
     /**
@@ -109,7 +110,7 @@ trait Response{
      *
      * @return void
      */
-    protected function result($msg, $data = null, $code = 200, array $header = [], $status = 1)
+    protected function result($msg, $data = null, $code = ResponseEnum::SUCCESS_CODE, array $header = [], $status = 1)
     {
         $result = [
             'code' => $code, //只有code==200时为请求成功
@@ -118,6 +119,6 @@ trait Response{
             'data' => $data,
         ];
 
-        throw new HttpResponseException($code, $msg, ['data' => $result]);
+        throw new HttpResponseException($code, $msg, ['data' => $result, 'header' => $header]);
     }
 }

@@ -3,6 +3,7 @@
  * Here is your custom functions.
  */
 
+use app\enum\ResponseEnum;
 use app\exception\HttpResponseException;
 use support\Cache;
 use Symfony\Component\VarDumper\VarDumper;
@@ -26,16 +27,16 @@ if (!function_exists('request_limit')) {
      * @param string $key 缓存名称
      * @param int $time 防抖时间（秒）
      */
-    function request_limit($function_name, $key, $time = 5)
+    function request_limit($function_name, $key, $time = ResponseEnum::REQUEST_LIMIT__DEFAULT_TIME)
     {
         $cacheKey = $function_name . '_' . $key; //缓存名称
         if (Cache::has($cacheKey)){
             $result = [
-                'code' => 500, //只有code==200时为请求成功
-                'msg'  => '请不要频繁操作',
+                'code' => ResponseEnum::ERROR_CODE, //只有code==200时为请求成功
+                'msg'  => ResponseEnum::REQUEST_LIMIT_MSG,
                 'data' => null,
             ];
-            throw new HttpResponseException(500, '', ['data' => $result]);
+            throw new HttpResponseException(ResponseEnum::ERROR_CODE, '', ['data' => $result]);
         }
         Cache::set($cacheKey, time(), $time);
     }

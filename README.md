@@ -1,10 +1,11 @@
-<div style="padding:18px;max-width: 1024px;margin:0 auto;background-color:#fff;color:#333">
-<h1>webman</h1>
-
-基于<a href="https://www.workerman.net" target="__blank">workerman</a>开发的超高性能PHP框架
+## webman基础框架
 
 
-<h1>学习</h1>
+基于<a href="https://www.workerman.net" target="__blank">workerman</a>开发的超高性能PHP框架，已集成各个扩展、controller-service-repository-model分层结构、常用函数和插件封装、枚举常量等
+
+
+
+## 学习webman
 
 <ul>
   <li>
@@ -30,30 +31,67 @@
   </li>
 </ul>
 
-<div style="float:left;padding-bottom:30px;">
 
-  <h1>赞助商</h1>
+## 扩展包和插件详情
 
-  <h4>特别赞助</h4>
-  <a href="https://www.crmeb.com/?form=workerman" target="__blank">
-    <img src="https://www.workerman.net/img/sponsors/6429/20230719111500.svg" width="200">
-  </a>
+### 管理后台
 
-  <h4>铂金赞助</h4>
-  <a href="https://www.fadetask.com/?from=workerman" target="__blank"><img src="https://www.workerman.net/img/sponsors/1/20230719084316.png" width="200"></a>
-  <a href="https://www.yilianyun.net/?from=workerman" target="__blank" style="margin-left:20px;"><img src="https://www.workerman.net/img/sponsors/6218/20230720114049.png" width="200"></a>
-
-  <h4>金牌赞助</h4>
+[webman-admin 手册 (workerman.net)](https://www.workerman.net/doc/webman-admin/)
 
 
-</div>
+
+### summernote富文本编辑器
 
 
-<div style="clear: both">
-<h1>LICENSE</h1>
-The webman is open-sourced software licensed under the MIT.
-</div>
 
-</div>
+### 用户认证
+
+[shopwwi/webman-auth: webman auth用户认证 (github.com)](https://github.com/shopwwi/webman-auth)
 
 
+
+### 统一response响应
+
+基于[mouyong/php-support-webman (workerman.net)](https://www.workerman.net/plugin/23)+[Thinkphp封装统一响应-CSDN博客](https://blog.csdn.net/C_jian/article/details/138060543?spm=1001.2014.3001.5501)+[ Exception 异常插件](https://www.workerman.net/plugin/16)整合
+
+
+
+### 命令行
+
+[webman命令行-webman (workerman.net)](https://www.workerman.net/plugin/1)
+
+
+
+### 使用env
+
+[zhqingphp/webman-env (github.com)](https://github.com/zhqingphp/webman-env)
+
+
+
+### 异常处理
+
+[🤬 Exception 异常插件-webman (workerman.net)](https://www.workerman.net/plugin/16)
+
+
+
+### 验证器
+
+[top-think/think-validate: think Validate (github.com)](https://github.com/top-think/think-validate)
+
+
+
+### 文件上传
+
+[🌾 简单多文件上传插件-webman (workerman.net)](https://www.workerman.net/plugin/21)
+
+
+
+### 使用dd()函数
+
+[Thinkphp使用dd()函数_tp5 dd()-CSDN博客](https://blog.csdn.net/C_jian/article/details/138267632?spm=1001.2014.3001.5501)
+
+
+
+### 依赖自动注入
+
+[[依赖自动注入](https://www.workerman.net/doc/webman/di.html#依赖自动注入)](https://www.workerman.net/doc/webman/di.html)
